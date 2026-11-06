@@ -1,0 +1,9 @@
+case,relation,spearman,expected_sign,as_expected
+nmos_off,temperature,0.235,+,True
+nmos_off,|vth0|,-0.218,-,True
+pmos_off,temperature,0.297,+,True
+pmos_off,|vth0|,-0.153,-,True
+nmos_on,toxe -> |ig|,-0.399,-,True
+nmos_off,toxe -> |ig|,-0.597,-,True
+pmos_on,toxe -> |ig|,-0.184,-,True
+pmos_off,toxe -> |ig|,-0.683,-,True
