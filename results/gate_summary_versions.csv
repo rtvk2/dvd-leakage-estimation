@@ -1,0 +1,4 @@
+version,median_error_pct,p95_error_pct,mean_error_pct,bias_pct,max_error_pct,points,source
+"XX=1 sizing, first OFF models",2.007368471545,8.450954953123,2.8168157738386204,-1.1698257247763875,18.031838395399998,3600,first run of notebook 05 with XX=1 (kept in results/archive_xx1/gate_results_xx1.csv for the per-case table)
+"XX=2 sizing, first OFF models (before refinement)",1.4895924113999999,7.361481278410496,2.3444494701132497,-0.7463813308116808,16.470045129899997,3600,data/gate_ml.csv of git commit 2acd831 (notebook 05 run with the models of section 15 of notebook 03)
+"XX=2 sizing, refined OFF models (final)",0.5770723050575,2.365820412559498,0.8308887273831813,-0.0870095949058898,8.39575456075,3600,data/gate_ml.csv (this run)

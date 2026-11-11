@@ -1,4 +1,4 @@
-composition,median,p95,largest
-component sum,1.08e-09,1.93e-07,9.26e-06
-KCL at VDD,1.38e-08,1.81e-06,2.84e-04
-component sum without the channel term of ON transistors,3.43e-03,2.78e-01,2.99e-01
+,median,p95,largest
+component sum,1.0823059115594447e-09,1.9304965457878064e-07,9.255507202543534e-06
+KCL at VDD,1.380740050072049e-08,1.8116999597583784e-06,0.00028372827636347075
+component sum without the channel term of ON transistors,0.003433401284059945,0.2782676983635349,0.29879873211727603
