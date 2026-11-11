@@ -1,0 +1,142 @@
+* 3-bit carry-lookahead adder, 40 gates: 1 corner(s) x 4 input vector(s)
+* inputs a0..a2, b0..b2, c0 (carry-in); outputs s0..s2 and c3 (carry-out)
+.include "../Model Files-20261105/models/16nm_HP.pm"
+.options gmin=1e-18 abstol=1e-18 reltol=1e-6 vntol=1e-9
+
+.param Lmin=1.6e-08
+.param Wmin=1.6e-08
+.param Ldiff=3.2e-08
+.param XX=2
+
+* gates (sizes as in Part B): widths are multiples of Wmin, junction areas AD = AS = W*Ldiff
+.subckt inv a y vdd
+MP y a vdd vdd pmos W={2*XX*Wmin} L={Lmin} AD={2*XX*Wmin*Ldiff} AS={2*XX*Wmin*Ldiff}
+MN y a 0 0 nmos W={XX*Wmin} L={Lmin} AD={XX*Wmin*Ldiff} AS={XX*Wmin*Ldiff}
+.ends
+.subckt nand2 a b y vdd
+MP1 y a vdd vdd pmos W={2*XX*Wmin} L={Lmin} AD={2*XX*Wmin*Ldiff} AS={2*XX*Wmin*Ldiff}
+MP2 y b vdd vdd pmos W={2*XX*Wmin} L={Lmin} AD={2*XX*Wmin*Ldiff} AS={2*XX*Wmin*Ldiff}
+MN1 y a x 0 nmos W={2*XX*Wmin} L={Lmin} AD={2*XX*Wmin*Ldiff} AS={2*XX*Wmin*Ldiff}
+MN2 x b 0 0 nmos W={2*XX*Wmin} L={Lmin} AD={2*XX*Wmin*Ldiff} AS={2*XX*Wmin*Ldiff}
+.ends
+.subckt nor2 a b y vdd
+MP1 z a vdd vdd pmos W={4*XX*Wmin} L={Lmin} AD={4*XX*Wmin*Ldiff} AS={4*XX*Wmin*Ldiff}
+MP2 y b z vdd pmos W={4*XX*Wmin} L={Lmin} AD={4*XX*Wmin*Ldiff} AS={4*XX*Wmin*Ldiff}
+MN1 y a 0 0 nmos W={XX*Wmin} L={Lmin} AD={XX*Wmin*Ldiff} AS={XX*Wmin*Ldiff}
+MN2 y b 0 0 nmos W={XX*Wmin} L={Lmin} AD={XX*Wmin*Ldiff} AS={XX*Wmin*Ldiff}
+.ends
+.subckt and2 a b y vdd
+X1 a b n vdd nand2
+X2 n y vdd inv
+.ends
+.subckt or2 a b y vdd
+X1 a b n vdd nor2
+X2 n y vdd inv
+.ends
+
+Vdd vdd 0 0.9
+Va0 a0 0 0
+Va1 a1 0 0
+Va2 a2 0 0
+Vb0 b0 0 0
+Vb1 b1 0 0
+Vb2 b2 0 0
+Vc0 c0 0 0
+Xpx0n1 a0 b0 px0_n1 vdd nand2
+Xpx0n2 a0 px0_n1 px0_n2 vdd nand2
+Xpx0n3 b0 px0_n1 px0_n3 vdd nand2
+Xpx0n4 px0_n2 px0_n3 p0 vdd nand2
+Xg0 a0 b0 g0 vdd and2
+Xpx1n1 a1 b1 px1_n1 vdd nand2
+Xpx1n2 a1 px1_n1 px1_n2 vdd nand2
+Xpx1n3 b1 px1_n1 px1_n3 vdd nand2
+Xpx1n4 px1_n2 px1_n3 p1 vdd nand2
+Xg1 a1 b1 g1 vdd and2
+Xpx2n1 a2 b2 px2_n1 vdd nand2
+Xpx2n2 a2 px2_n1 px2_n2 vdd nand2
+Xpx2n3 b2 px2_n1 px2_n3 vdd nand2
+Xpx2n4 px2_n2 px2_n3 p2 vdd nand2
+Xg2 a2 b2 g2 vdd and2
+Xpc0 p0 c0 pc0 vdd and2
+Xc1 g0 pc0 c1 vdd or2
+Xt1 p1 g0 t1 vdd and2
+Xt2 p1 p0 t2 vdd and2
+Xt3 t2 c0 t3 vdd and2
+Xo1 g1 t1 o1 vdd or2
+Xc2 o1 t3 c2 vdd or2
+Xu1 p2 g1 u1 vdd and2
+Xu2 p2 t1 u2 vdd and2
+Xu3 p2 t3 u3 vdd and2
+Xo2 g2 u1 o2 vdd or2
+Xo3 o2 u2 o3 vdd or2
+Xc3 o3 u3 c3 vdd or2
+Xsx0n1 p0 c0 sx0_n1 vdd nand2
+Xsx0n2 p0 sx0_n1 sx0_n2 vdd nand2
+Xsx0n3 c0 sx0_n1 sx0_n3 vdd nand2
+Xsx0n4 sx0_n2 sx0_n3 s0 vdd nand2
+Xsx1n1 p1 c1 sx1_n1 vdd nand2
+Xsx1n2 p1 sx1_n1 sx1_n2 vdd nand2
+Xsx1n3 c1 sx1_n1 sx1_n3 vdd nand2
+Xsx1n4 sx1_n2 sx1_n3 s1 vdd nand2
+Xsx2n1 p2 c2 sx2_n1 vdd nand2
+Xsx2n2 p2 sx2_n1 sx2_n2 vdd nand2
+Xsx2n3 c2 sx2_n1 sx2_n3 vdd nand2
+Xsx2n4 sx2_n2 sx2_n3 s2 vdd nand2
+
+.control
+set numdgt = 15
+* corner 0
+altermod nmos vth0=0.47965
+altermod nmos toxe=9.5e-10
+altermod nmos ndep=7e+18
+altermod nmos u0=0.03
+altermod nmos xj=5e-09
+altermod pmos vth0=-0.43121
+altermod pmos toxe=1e-09
+altermod pmos ndep=5.5e+18
+altermod pmos u0=0.006
+altermod pmos xj=5e-09
+set temp = 27
+alter vdd = 0.9
+echo @@ 0 0
+alter va0 = 0
+alter va1 = 0
+alter va2 = 0
+alter vb0 = 0
+alter vb1 = 0
+alter vb2 = 0
+alter vc0 = 0
+op
+print i(vdd) i(va0) i(va1) i(va2) i(vb0) i(vb1) i(vb2) i(vc0) v(vdd) v(a0) v(a1) v(a2) v(b0) v(b1) v(b2) v(c0) v(s0) v(s1) v(s2) v(c3)
+echo @@ 0 27
+alter va0 = 0.9
+alter va1 = 0.9
+alter va2 = 0
+alter vb0 = 0.9
+alter vb1 = 0.9
+alter vb2 = 0
+alter vc0 = 0
+op
+print i(vdd) i(va0) i(va1) i(va2) i(vb0) i(vb1) i(vb2) i(vc0) v(vdd) v(a0) v(a1) v(a2) v(b0) v(b1) v(b2) v(c0) v(s0) v(s1) v(s2) v(c3)
+echo @@ 0 77
+alter va0 = 0.9
+alter va1 = 0
+alter va2 = 0.9
+alter vb0 = 0.9
+alter vb1 = 0
+alter vb2 = 0
+alter vc0 = 0.9
+op
+print i(vdd) i(va0) i(va1) i(va2) i(vb0) i(vb1) i(vb2) i(vc0) v(vdd) v(a0) v(a1) v(a2) v(b0) v(b1) v(b2) v(c0) v(s0) v(s1) v(s2) v(c3)
+echo @@ 0 127
+alter va0 = 0.9
+alter va1 = 0.9
+alter va2 = 0.9
+alter vb0 = 0.9
+alter vb1 = 0.9
+alter vb2 = 0.9
+alter vc0 = 0.9
+op
+print i(vdd) i(va0) i(va1) i(va2) i(vb0) i(vb1) i(vb2) i(vc0) v(vdd) v(a0) v(a1) v(a2) v(b0) v(b1) v(b2) v(c0) v(s0) v(s1) v(s2) v(c3)
+.endc
+.end
