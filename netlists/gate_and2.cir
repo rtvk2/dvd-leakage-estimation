@@ -1,0 +1,60 @@
+* AND2 gate, 16nm_HP: 1 corner(s) x 4 input pattern(s)
+* inputs A, B; recorded internal/output nodes: x, n, out
+.include "../Model Files-20261105/models/16nm_HP.pm"
+.options gmin=1e-18 abstol=1e-18 reltol=1e-6 vntol=1e-9
+
+.param Lmin=1.6e-08
+.param Wmin=1.6e-08
+.param Ldiff=3.2e-08
+
+* devices: junction areas AD = AS = W*Ldiff; NMOS bodies on vss, PMOS bodies on vdd
+MP1 n a vdd vdd pmos W={4*Wmin} L={Lmin} AD={4*Wmin*Ldiff} AS={4*Wmin*Ldiff}
+MP2 n b vdd vdd pmos W={4*Wmin} L={Lmin} AD={4*Wmin*Ldiff} AS={4*Wmin*Ldiff}
+MN1 n a x vss nmos W={4*Wmin} L={Lmin} AD={4*Wmin*Ldiff} AS={4*Wmin*Ldiff}
+MN2 x b vss vss nmos W={4*Wmin} L={Lmin} AD={4*Wmin*Ldiff} AS={4*Wmin*Ldiff}
+MP3 out n vdd vdd pmos W={4*Wmin} L={Lmin} AD={4*Wmin*Ldiff} AS={4*Wmin*Ldiff}
+MN3 out n vss vss nmos W={2*Wmin} L={Lmin} AD={2*Wmin*Ldiff} AS={2*Wmin*Ldiff}
+
+* supply, inputs and the ground rail (0 V source: its current closes the Kirchhoff balance)
+Vdd vdd 0 0.9
+Va a 0 0
+Vb b 0 0
+Vss vss 0 0
+
+.control
+set numdgt = 15
+* corner 0
+altermod nmos vth0=0.47965
+altermod nmos toxe=9.5e-10
+altermod nmos ndep=7e+18
+altermod nmos u0=0.03
+altermod nmos xj=5e-09
+altermod pmos vth0=-0.43121
+altermod pmos toxe=1e-09
+altermod pmos ndep=5.5e+18
+altermod pmos u0=0.006
+altermod pmos xj=5e-09
+set temp = 27
+alter vdd = 0.9
+echo @@ 0 00
+alter va = 0
+alter vb = 0
+op
+print i(vdd) i(va) i(vb) i(vss) v(vdd) v(a) v(b) v(x) v(n) v(out)
+echo @@ 0 01
+alter va = 0
+alter vb = 0.9
+op
+print i(vdd) i(va) i(vb) i(vss) v(vdd) v(a) v(b) v(x) v(n) v(out)
+echo @@ 0 10
+alter va = 0.9
+alter vb = 0
+op
+print i(vdd) i(va) i(vb) i(vss) v(vdd) v(a) v(b) v(x) v(n) v(out)
+echo @@ 0 11
+alter va = 0.9
+alter vb = 0.9
+op
+print i(vdd) i(va) i(vb) i(vss) v(vdd) v(a) v(b) v(x) v(n) v(out)
+.endc
+.end
