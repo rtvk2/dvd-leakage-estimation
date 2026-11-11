@@ -1,6 +1,6 @@
 """Regenerate every result of the project from the model file: run the notebooks in order.
 
-    python scripts/run_all.py              # all notebooks, in order (about 2 h; notebook 03 dominates)
+    python scripts/run_all.py              # all notebooks, in order (about 2.5 to 3 h; notebooks 03 and 06 dominate)
     python scripts/run_all.py 04 05 06     # only some of them (their inputs must already exist)
 
 Each notebook is self-contained and uses fixed random seeds (data 20261105 + case, corners 20261105 + 100, data split
