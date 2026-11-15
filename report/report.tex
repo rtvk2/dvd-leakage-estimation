@@ -340,11 +340,10 @@ Circuit-level error is strongly temperature-driven through composition: hierarch
 \end{itemize}
 
 \section*{Contributions}
-Work was divided across the team, with a slightly larger share to Lakshya Jindal and Sai Ritvik Uppuganti.
 \begin{itemize}[leftmargin=*]
 \item \textbf{Lakshya Jindal:} Contributed to dataset generation and data-quality checks for the four transistor cases (sampling, SPICE runs, Kirchhoff/trend verification), and contributed to transistor model development including preprocessing, training/comparison of model families, model selection, OFF-model refinement, and final model evaluation.
 \item \textbf{Sai Ritvik Uppuganti:} Contributed to development of the regeneration/testing workflow and self-contained scripts, gate-level and circuit-level validation runs, integration/debugging of the end-to-end pipeline, results verification, and report/LaTeX preparation and build support.
-\item \textbf{Swarnava Pal:} Contributed to gate/corner setup and SPICE evaluation support, gate- and circuit-level analysis, plotting/result tabulation, documentation, and cross-checking of deliverables.
+\item \textbf{Swarnava Pal:} Contributed to model training and validation, CLA circuit setup, gate/corner setup and SPICE evaluation support, gate- and circuit-level analysis, plotting/result tabulation, documentation, and cross-checking of deliverables.
 \item \textbf{Divesh Kumar:} Contributed to circuit-level validation and error analysis within the submitted project (SPICE/ML result comparisons, per-vector/corner checks, and supporting experiment runs), along with result cross-checking, debugging assistance, and documentation support.
 \end{itemize}
 
@@ -355,7 +354,12 @@ Work was divided across the team, with a slightly larger share to Lakshya Jindal
 \item OFF refinement extras (train/rail-val only): \texttt{data/extra\_nmos\_off.csv}, \texttt{data/extra\_pmos\_off.csv}
 \item Netlists: \texttt{netlists/single\_*.cir} (4), \texttt{netlists/gate\_*.cir} (5), \texttt{netlists/test\_circuit\_cla3.cir}
 \item Models: \texttt{models/nmos\_on.npz}, \texttt{models/nmos\_off.npz}, \texttt{models/pmos\_on.npz}, \texttt{models/pmos\_off.npz}
-\item Key result tables: \texttt{results/model\_comparison\_table.csv}, \texttt{results/chosen\_models\_test.csv}, \texttt{results/final\_models\_test.csv}, \texttt{results/final\_models\_test\_per\_terminal.csv}, \texttt{results/gate\_results.csv}, \texttt{results/circuit\_results.csv}, \texttt{results/circuit\_results\_by\_vector.csv}, \texttt{results/refinement\_before\_after.csv}, \texttt{results/kirchhoff\_check.csv}, \texttt{results/trend\_check.csv}
+\item Key result tables:\\
+\texttt{results/model\_comparison\_table.csv}, \texttt{results/chosen\_models\_test.csv},\\
+\texttt{results/final\_models\_test.csv}, \texttt{results/final\_models\_test\_per\_terminal.csv},\\
+\texttt{results/gate\_results.csv}, \texttt{results/circuit\_results.csv},\\
+\texttt{results/circuit\_results\_by\_vector.csv}, \texttt{results/refinement\_before\_after.csv},\\
+\texttt{results/kirchhoff\_check.csv}, \texttt{results/trend\_check.csv}
 \item Plots: \texttt{results/kirchhoff\_check.png}, \texttt{results/trend\_*.png}, \texttt{results/model\_comparison.png}, \texttt{results/pred\_vs\_spice\_*.png}, \texttt{results/gate\_parity.png}, \texttt{results/gate\_error\_factors.png}, \texttt{results/circuit\_parity.png}
 \item Code (regenerate in order, fixed seeds): \texttt{scripts/01\_gen\_data.py}--\texttt{scripts/07\_error\_analysis.py}, \texttt{scripts/run\_all.py}; notebooks: \texttt{notebooks/01\_gen\_data.ipynb}--\texttt{notebooks/07\_error\_analysis.ipynb}
 \end{itemize}
