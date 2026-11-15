@@ -24,7 +24,8 @@
 \noindent Model file \textbf{16nm\_HP}, nominal \textbf{VDD 0.9 V}, test circuit \textbf{3-bit carry-lookahead adder (CLA)}.
 
 \section*{Summary}
-Four transistor models (NMOS and PMOS, ON and OFF; residual neural networks on four 10{,}000-sample SPICE datasets of the 16nm\_HP card) predict the four terminal currents of a transistor from its voltages, width, temperature and five process parameters. Their predictions, taken at SPICE-recorded node voltages, are summed to the leakage of five gates (INV, NAND2, NOR2, AND2, OR2) at 200 PVT corners, and the gate leakages are summed to the leakage of a 3-bit carry-lookahead adder (40 gates, 128 input vectors). Every level is compared with a transistor-level ngspice simulation.
+\noindent Model file \textbf{16nm\_HP}, nominal \textbf{VDD 0.9 V}, test circuit \textbf{3-bit carry-lookahead adder (CLA)}.\\
+Repository: \url{https://github.com/rtvk2/dvd-leakage-estimation}
 
 \begin{table}[H]\centering\small
 \caption{Summary of results (relative error against SPICE)}
