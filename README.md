@@ -41,7 +41,7 @@ The two OFF models were refined with 6,000 extra samples each near the supply ra
 | 7 | Gate parity plot | `results/gate_parity.png` |
 | 8 | Test-circuit results and parity plot | `results/circuit_results.csv`, `circuit_results_by_vector.csv`, `circuit_parity.png` (data: `data/circuit_spice.csv`, `data/circuit_ml.csv`) |
 | 9 | Code that regenerates everything | `scripts/01_gen_data.py` to `scripts/07_error_analysis.py` (self-contained, run in order), `scripts/run_all.py`; executed notebooks `notebooks/01_gen_data.ipynb` to `07_error_analysis.ipynb` (same logic/outputs, for inspection) |
-| 10 | Report | `report/report.tex`, `report/report.pdf` (LaTeX), `report/report.docx` (built by `report/build_report.py` from result files) |
+| 10 | Report | `report/report.tex`, `report/report.pdf` (LaTeX) |
 
 ## Reproducing the results
 
@@ -55,7 +55,7 @@ python scripts/03_train.py             # run a single step directly
 
 **Notebooks:** `notebooks/01_gen_data.ipynb`–`07_error_analysis.ipynb` are the executed notebooks with outputs kept for inspection/review. The scripts contain the same logic as the notebook code (extracted/self-contained) and are the recommended regeneration path.
 
-**Report:** `report/report.pdf` is prebuilt from `report/report.tex`; rebuild with `pdflatex report.tex` (run twice) in `report/`. `report/report.docx` can be rebuilt from result files via `python report/build_report.py`.
+**Report:** `report/report.pdf` is prebuilt from `report/report.tex`; rebuild with `pdflatex report.tex` (run twice) in `report/`.
 
 | Script / Notebook step | Content | Time on the machine used |
 |---|---|---|
@@ -83,7 +83,7 @@ models/      the four saved transistor models (numpy files, no PyTorch needed to
 netlists/    example netlists
 notebooks/   01 to 07, executed, with outputs
 results/     tables (CSV) and figures (PNG) for all deliverables
-report/      report.tex, report.pdf, report.docx and build scripts
+report/      report.tex, report.pdf
 scripts/     01_gen_data.py–07_error_analysis.py (self-contained), run_all.py
 ```
 
