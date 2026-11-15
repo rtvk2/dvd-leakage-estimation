@@ -26,7 +26,7 @@ Errors are relative errors against SPICE.
 
 **Test circuit** (128 input vectors x 200 corners = 25,600 points): hierarchical ML against the full-circuit SPICE: median **1.50 %**, 95th percentile 6.15 %, mean 2.07 %. With perfect gate models the same composition would give a median of 1.37 % and a 95th percentile of 5.25 % (loading and non-rail gate inputs are ignored, as prescribed), so most of the circuit error is the composition itself; it grows with temperature (median error 0.60 % in the coldest bin, -40 to -12.5 degC, and 3.87 % in the hottest, 97.5 to 125 degC).
 
-The two OFF models were refined with 6,000 extra samples each near the supply rails, where the gates operate (notebook 03, section 16): the gate-level median error fell from 1.49 % to 0.58 % and the 95th percentile from 7.36 % to 2.37 %, at the price of a slightly worse score on the uniform test samples. Details, tables and the error analysis are in the report.
+The two OFF models were refined with 6,000 extra samples each near the supply rails, where the gates operate: the gate-level median error fell from 1.49 % to 0.58 % and the 95th percentile from 7.36 % to 2.37 %, at the price of a slightly worse score on the uniform test samples. Details, tables and the error analysis are in the report and `results/refinement_before_after.csv`.
 
 ## Deliverables
 
@@ -40,20 +40,24 @@ The two OFF models were refined with 6,000 extra samples each near the supply ra
 | 6 | Gate results table | `results/gate_results.csv` (data: `data/gate_spice.csv`, `data/gate_ml.csv`) |
 | 7 | Gate parity plot | `results/gate_parity.png` |
 | 8 | Test-circuit results and parity plot | `results/circuit_results.csv`, `circuit_results_by_vector.csv`, `circuit_parity.png` (data: `data/circuit_spice.csv`, `data/circuit_ml.csv`) |
-| 9 | Code that regenerates everything | `notebooks/01` to `07`, `scripts/run_all.py` |
-| 10 | Report | `report/report.docx` (built by `report/build_report.py`) |
+| 9 | Code that regenerates everything | `scripts/01_gen_data.py` to `scripts/07_error_analysis.py` (self-contained, run in order), `scripts/run_all.py`; executed notebooks `notebooks/01_gen_data.ipynb` to `07_error_analysis.ipynb` (same logic/outputs, for inspection) |
+| 10 | Report | `report/report.tex`, `report/report.pdf` (LaTeX), `report/report.docx` (built by `report/build_report.py` from result files) |
 
 ## Reproducing the results
 
-Each notebook is self-contained (it needs only the model file and the files written by earlier notebooks) and uses fixed seeds: data `20261105 + case`, corners `20261105 + 100`, data split `20261105`, model fits seed 0. Run them in order:
+**Preferred (self-contained scripts):** `scripts/01_gen_data.py`–`07_error_analysis.py` are standalone Python scripts (no notebook execution, no `nbconvert`/Jupyter required to run them). Each uses fixed seeds and writes to `data/`, `models/`, `netlists/`, and `results/`. Run from the project root, in order (later steps require outputs of earlier steps):
 
 ```bash
-python scripts/run_all.py              # notebooks 01 to 07 in order, executed in place
-python scripts/run_all.py 05 06 07     # only some of them (their inputs must exist)
-python report/build_report.py          # rebuild report/report.docx from the result files
+python scripts/run_all.py              # runs scripts 01 to 07 in order
+python scripts/run_all.py 04 05 06     # run only selected steps (their inputs must exist)
+python scripts/03_train.py             # run a single step directly
 ```
 
-| Notebook | Content | Time on the machine used |
+**Notebooks:** `notebooks/01_gen_data.ipynb`–`07_error_analysis.ipynb` are the executed notebooks with outputs kept for inspection/review. The scripts contain the same logic as the notebook code (extracted/self-contained) and are the recommended regeneration path.
+
+**Report:** `report/report.pdf` is prebuilt from `report/report.tex`; rebuild with `pdflatex report.tex` (run twice) in `report/`. `report/report.docx` can be rebuilt from result files via `python report/build_report.py`.
+
+| Script / Notebook step | Content | Time on the machine used |
 |---|---|---|
 | `01_gen_data` | four single-transistor datasets, example netlists, extra rail samples for the OFF cases | 3 min |
 | `02_check_data` | Kirchhoff check, three trend plots | 1 min |
@@ -63,8 +67,7 @@ python report/build_report.py          # rebuild report/report.docx from the res
 | `06_circuit` | 3-bit CLA netlist, 25,600 SPICE points, hierarchical ML prediction | 35 min (4 ngspice processes) |
 | `07_error_analysis` | errors by gate, input pattern, corner condition, model and component, gate-input voltage, input vector | under 1 min |
 
-A rerun reproduces the datasets, the SPICE references and the models' scores (the four datasets, `corners.csv`, `gate_spice.csv` and `circuit_spice.csv` come out byte-identical).
-
+A rerun reproduces the datasets, the SPICE references and the models' scores (the four datasets, `corners.csv`, `gate_spice.csv` and `circuit_spice.csv` come out byte-identical given the same environment/model/ngspice). Fixed seeds: data `20261105 + case`, corners `20261105 + 100`, data split `20261105`, model fits seed 0.
 ## Method in short
 
 * **Data:** one-transistor netlists with an own voltage source on every terminal; VDD, temperature, width, drain and source voltage and `vth0, toxe, ndep, u0, xj` sampled as in the project text; the terminal currents into the device are the negatives of the source currents (`set numdgt = 15`, one `altermod` per parameter, `AD = AS = W x 32 nm`).
@@ -80,10 +83,10 @@ models/      the four saved transistor models (numpy files, no PyTorch needed to
 netlists/    example netlists
 notebooks/   01 to 07, executed, with outputs
 results/     tables (CSV) and figures (PNG) for all deliverables
-report/      report.docx and the scripts that build it
-scripts/     run_all.py
+report/      report.tex, report.pdf, report.docx and build scripts
+scripts/     01_gen_data.py–07_error_analysis.py (self-contained), run_all.py
 ```
 
 ## Requirements
 
-ngspice (natively or through WSL on Windows) and the Python packages in `requirements.txt` (numpy, pandas, scipy, scikit-learn, LightGBM, PyTorch (CPU), matplotlib, joblib, python-docx, jupyter / nbconvert). The notebooks call `ngspice` directly when it is on the PATH and through `wsl` otherwise; the model files are expected in `Model Files-20261105/models/`.
+ngspice (natively or through WSL on Windows) and the Python packages in `requirements.txt` (numpy, pandas, scipy, scikit-learn, LightGBM, PyTorch (CPU), matplotlib, joblib, python-docx, jupyter / nbconvert). **Scripts** (`scripts/01..07`, `run_all.py`) do not require Jupyter/nbconvert; Jupyter/nbconvert are only needed if you want to re-execute the notebooks. The scripts/notebooks call `ngspice` directly when it is on the PATH and through `wsl` otherwise; the model files are expected in `Model Files-20261105/models/`.
