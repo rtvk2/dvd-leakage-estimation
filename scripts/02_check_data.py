@@ -76,7 +76,9 @@ def trend_panel(ax, x, y, xlabel, title, color):
     cx, med, lo, hi = binned(x, ly)
     ax.fill_between(cx, lo, hi, color="black", alpha=0.12)
     ax.plot(cx, med, color="black", lw=2)
-    ax.set_xlabel(xlabel); ax.set_title(title)
+    ax.set_xlabel(xlabel, fontsize=10); ax.set_ylabel("log10 |I_leak| [A]", fontsize=10)
+    ax.set_title(title, fontsize=10)
+    ax.tick_params(labelsize=9)
 
 def off_samples(case):
     d = data[case]

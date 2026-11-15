@@ -15,8 +15,18 @@
 \setlength{\parindent}{0pt}
 
 \title{ML-Driven PVT Variation Aware Leakage Estimation}
-\author{Digital VLSI Design --- Course Project}
-\date{November 2026}
+\author{Digital VLSI Design --- Course Project\\[8pt]
+\begin{tabular}{ll}
+\toprule
+\textbf{Team Member} & \textbf{Roll No.} \\
+\midrule
+Lakshya Jindal & 2023112017 \\
+Sai Ritvik Uppuganti & 2025122012 \\
+Divesh Kumar & 2024102079 \\
+Swarnava Pal & 2023112008 \\
+\bottomrule
+\end{tabular}}
+\date{}
 
 \begin{document}
 \maketitle
@@ -24,7 +34,6 @@
 \noindent Model file \textbf{16nm\_HP}, nominal \textbf{VDD 0.9 V}, test circuit \textbf{3-bit carry-lookahead adder (CLA)}.
 
 \section*{Summary}
-\noindent Model file \textbf{16nm\_HP}, nominal \textbf{VDD 0.9 V}, test circuit \textbf{3-bit carry-lookahead adder (CLA)}.\\
 Repository: \url{https://github.com/rtvk2/dvd-leakage-estimation}
 
 \begin{table}[H]\centering\small
@@ -39,7 +48,7 @@ Gate leakage (5 gates, 18 cases $\times$ 200 corners = 3{,}600 pts) & 0.58 & 2.3
 \bottomrule\end{tabular}}
 \end{table}
 
-The $R^2$ of the signed-log currents is at least 0.9996 for every transistor model. The gate-level error is below 3\% for 95\% of the points. The circuit-level hierarchical prediction has mean error 2.07\% (mean accuracy $100\%-2.07\%=97.93\%$, below a 99\% target); this is dominated by the prescribed composition method (ideal 0/VDD inputs, no inter-gate loading), whose oracle/composition floor is 1.37\% median / 5.25\% 95th / 1.85\% mean even with perfect gate models.
+The $R^2$ of the signed-log currents is at least 0.9996 for every transistor model. The gate-level error is below 3\% for 95\% of the points. The circuit-level hierarchical prediction has mean error 2.07\% (mean accuracy $100\%-2.07\%=97.93\%$, below a 99\% target in our setup); this is dominated by the prescribed composition method (ideal 0/VDD inputs, no inter-gate loading), whose oracle/composition floor is 1.37\% median / 5.25\% 95th / 1.85\% mean even with perfect gate models.
 
 \section{Setup}
 \begin{table}[H]\centering\small
@@ -86,7 +95,7 @@ PMOS ON & 10{,}000 & $9.84\times10^{-16}$ & $3.24\times10^{-17}$ & yes\\
 PMOS OFF & 10{,}000 & $1.30\times10^{-15}$ & $8.08\times10^{-17}$ & yes\\
 \bottomrule\end{tabular}\end{table}
 
-Residuals are at solver-tolerance level. Trend checks (all Spearman correlations have expected sign):
+Residuals are at solver-tolerance level. Trend checks (all Spearman correlations have expected sign). Spearman magnitudes are modest because all other inputs vary simultaneously in the sampled datasets, while the binned median lines in Figures~\ref{fig:trend_temp}--\ref{fig:trend_toxe} show the underlying trends:
 
 \begin{table}[H]\centering\small
 \caption{Trend checks}
@@ -104,13 +113,13 @@ PMOS OFF & toxe $\to |I_g|$ & $-0.683$ & $-$ & yes\\
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.7\textwidth]{trend_off_vs_temp.png}
-\caption{OFF-state leakage current vs temperature.}\end{figure}
+\caption{OFF-state leakage current vs temperature.}\label{fig:trend_temp}\end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=0.7\textwidth]{trend_off_vs_vth0.png}
-\caption{OFF-state leakage current vs $|v_{th0}|$.}\end{figure}
+\caption{OFF-state leakage current vs $|v_{th0}|$.}\label{fig:trend_vth0}\end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=0.7\textwidth]{trend_ig_vs_toxe.png}
-\caption{Gate current vs oxide thickness.}\end{figure}
+\caption{Gate current vs oxide thickness.}\label{fig:trend_toxe}\end{figure}
 
 \subsection{Split}
 Each dataset is split randomly into 70\% training (7{,}000), 15\% validation (1{,}500) and 15\% test (1{,}500) with fixed seed 20261105. The same split is used for every model type. All choices are made on training/validation; test samples are used once for final chosen models.
@@ -214,14 +223,24 @@ PMOS OFF & $I_b$ & 0.91 & 5.18 & 1.63 & 1.47\\
 Test errors agree with validation (max difference $\le 0.05$ pp). Median test error is below 1\% for NMOS ON (0.37\%), NMOS OFF (0.69\%), and PMOS ON (0.26\%); \textbf{PMOS OFF is 1.28\%}. Signed-log $R^2 \ge 0.9996$ for all cases. Hardest currents are PMOS OFF $I_s/I_g/I_d$ (small, sign-sensitive components). At $|V_{ds}|<5$ mV PMOS OFF channel currents have large relative error on few samples, but limited gate-level impact because channel terms are weighted by $V_{ds}$.
 
 \subsection{Rail-Sample Refinement (OFF models) --- Disclosure}
-After gate-level analysis showed OFF-model errors concentrate near supply rails, 6{,}000 extra SPICE samples per OFF case were generated (\texttt{data/extra\_nmos\_off.csv}, \texttt{data/extra\_pmos\_off.csv}; no overlap with original 10k datasets) with $V_d,V_s$ biased near rails/uniform mixture (no gate-level simulation/data used). For each OFF case, 5{,}000 extra samples were added to training only and 1{,}000 held out as a separate rail-validation set (not the uniform validation/test sets). Epoch/adoption decisions used uniform+rail validation only; original uniform test sets were used once for reporting. \textbf{No gate or circuit SPICE/ML results were used for training, selection, or tuning.} Adoption rule (validation-only): replace chosen OFF model if rail-validation median and 95th-percentile improve and uniform-validation median rises by $<0.5$ pp. Adopted refined models replaced only the two OFF saved models.
-
+Gate-level analysis motivated refinement of the OFF models: gate-level evaluation showed that OFF-model errors were concentrated near supply rails, where gate operating points lie. To address this, 6{,}000 extra SPICE samples per OFF case were generated (\texttt{data/extra\_nmos\_off.csv}, \texttt{data/extra\_pmos\_off.csv}; no overlap with the original 10k datasets) with $V_d,V_s$ biased near rails/uniform mixture; sample generation did not use gate-level SPICE/ML simulation data. For each OFF case, 5{,}000 extra samples were added to training and 1{,}000 were held out as a separate rail-validation set (not the uniform validation/test sets). The extra samples, adoption rule, and epoch choice used only transistor-level validation data (uniform and rail validation); the original uniform test sets were used once for reporting. The gate-level sizing/refinement comparisons in Table~\ref{tab:gate_progression} are post-hoc evaluation results; gate or circuit SPICE/ML errors were not used for transistor-model training, selection, or tuning. Adoption rule (validation-only): replace the chosen OFF model if rail-validation median and 95th-percentile improved and uniform-validation median rose by $<0.5$~pp. The adopted refined models replaced only the two OFF saved models.
 \section{Gate-Level Validation}
 
 \subsection{Gates, Corners, and SPICE Reference}
 Gates: INV (A=0,1), NAND2/NOR2/AND2/OR2 (AB=00,01,10,11) = 18 cases $\times$ 200 PVT corners = 3{,}600 SPICE simulations. Static CMOS; AND2=NAND2+INV, OR2=NOR2+INV as full netlists. \textbf{Corner draws:} each corner is one draw with \textbf{VDD and temperature common} to the gate/circuit; the five process parameters ($v_{th0},t_{oxe},ndep,u_0,x_j$) are drawn \textbf{separately for NMOS and PMOS} model cards from the Section~2.1 distributions (all NMOS devices in a gate/circuit share the NMOS draw, all PMOS share the PMOS draw). Corners are drawn once with fixed seed and stored in \texttt{data/corners.csv} (columns \texttt{corner,vdd,temp,n\_*,p\_*}) and reused for gates and test circuit. Inputs are exactly 0 or VDD. SPICE records leakage, internal/output node voltages. ML takes recorded node voltages to set each transistor's $(V_d,V_g,V_s,V_b)$, applies the 4 trained transistor models, and sums predicted currents into gate leakage.
+Gate sizing uses $W_{min}=16$ nm, $L_{min}=16$ nm, $L_{diff}=32$ nm and a multiplier $XX$ on pull-network widths. The \textbf{XX=2} sizing (Table~\ref{tab:gate_widths}) was adopted after comparing gate-level error (Table~\ref{tab:gate_progression}): XX=1 placed the minimum-width NMOS devices at 16~nm, the edge of the transistor training width range, and produced larger gate-level error before OFF-model refinement; XX=2 doubled those widths and reduced gate-level error. The stacked NOR2 PMOS devices reach $8W_{min}=128$~nm at the upper edge of the training width range, but in the final gate-level evaluation their errors remained comparable to other gates/cases (NOR2 case medians 0.48--0.79\%).
 
-Gate sizing: XX=2, $W_{min}=16$ nm, $L_{min}=16$ nm, $L_{diff}=32$ nm.
+\begin{table}[H]\centering\small
+\caption{Gate transistor widths ($W$) for XX=2 sizing ($W_{min}=16$ nm, $L=L_{min}$, $AD=AS=W\times L_{diff}$)}
+\label{tab:gate_widths}
+\begin{tabular}{lcc}\toprule
+Gate & NMOS $W$ & PMOS $W$\\\midrule
+INV & $2W_{min}=32$ nm & $4W_{min}=64$ nm\\
+NAND2 & $4W_{min}=64$ nm (stacked) & $4W_{min}=64$ nm (parallel)\\
+NOR2 & $2W_{min}=32$ nm (parallel) & $8W_{min}=128$ nm (stacked)\\
+AND2 & NAND2: $4W_{min}=64$ nm; inverter: $2W_{min}=32$ nm & NAND2: $4W_{min}=64$ nm; inverter: $4W_{min}=64$ nm\\
+OR2 & NOR2: $2W_{min}=32$ nm; inverter: $2W_{min}=32$ nm & NOR2: $8W_{min}=128$ nm; inverter: $4W_{min}=64$ nm\\
+\bottomrule\end{tabular}\end{table}
 
 \subsection{Gate Results}
 \begin{table}[H]\centering\scriptsize
@@ -257,7 +276,8 @@ Over all 3{,}600 points: \textbf{median 0.58\%}, 95th percentile 2.37\%, mean 0.
 \caption{ML vs SPICE gate leakage, 18 cases $\times$ 200 corners (log axes).}\end{figure}
 
 \begin{table}[H]\centering\small
-\caption{Gate-level error progression (sizing/refinement decisions)}
+\caption{Gate-level error progression (sizing/refinement comparisons; XX=2 sizing and OFF-model refinement were adopted after observing gate-level error)}
+\label{tab:gate_progression}
 \begin{tabular}{lccccc}\toprule
 Version & Median [\%] & P95 [\%] & Mean [\%] & Bias [\%] & Max [\%]\\\midrule
 XX=1 sizing, first OFF models & 2.01 & 8.45 & 2.82 & $-1.17$ & 18.03\\
@@ -292,10 +312,10 @@ ML median [A] & $1.300\times10^{-5}$ & $1.298\times10^{-5}$ & ---\\
 Hierarchical prediction: median 1.50\%, 95th 6.15\%, mean 2.07\% (bias $-1.88$\%); 38\% of points within 1\%, 92\% within 5\%, 98.6\% within 10\%. Interpreted as mean accuracy $100\%-\text{mean error}$, this is \textbf{97.93\%}, below a 99\% target. As the spec anticipates, circuit accuracy is lower due to ignored loading: the composition floor with perfect gate models is 1.37\%/5.25\%/1.85\% (systematic underestimate), while ML gate models add little vs isolated-gate SPICE (0.48\%/2.17\%/0.70\%). Thus the visible circuit-level gap is primarily composition/model-form error, not transistor-model error.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.9\textwidth]{circuit_parity.png}
-\caption{Left: ML vs SPICE leakage of complete circuit (log axes); right: median signed error vs temperature.}\end{figure}
+\includegraphics[width=\textwidth]{circuit_parity.png}
+\caption{Left: ML vs SPICE leakage of complete circuit (log axes); right: median signed error vs temperature.}\label{fig:circuit_parity}\end{figure}
 
-Per-vector median error varies little (1.04--2.10\% across 128 vectors in per-vector table).
+Per-vector median error varies little overall (1.04--2.10\% across 128 vectors in the per-vector table). The best vector is 57 ($a{=}001_2,b{=}111_2,c_0{=}0$; median 1.04\%, bias $-1.14\%$), and the worst is 64 ($a{=}000_2,b{=}000_2,c_0{=}1$; median 2.10\%, bias $-2.55\%$). The highest-error vectors are concentrated at low/small-$a,b$ combinations with $c_0{=}1$ (e.g. 64, 66, 68, 73, 82), where hierarchical composition underestimates leakage most strongly (larger negative bias), while the lowest-error vectors occur at mixed input patterns with smaller bias.
 
 \section{Error Analysis}
 
@@ -311,19 +331,19 @@ Circuit-level error is strongly temperature-driven through composition: hierarch
 
 \section{Limitations and Improvements}
 \begin{itemize}[leftmargin=*]
-\item \textbf{Hierarchical composition / loading (main circuit shortfall).} Circuit prediction sums isolated-gate leakages with ideal 0/VDD inputs and no inter-gate loading (as prescribed). Composition floor is 1.37\% median / 5.25\% 95th / 1.85\% mean overall and worsens at hot corners (systematic underestimate), so 99\% circuit mean accuracy is not reachable there with this composition even with perfect gate models. \textbf{Simple improvement:} add a loading/voltage-propagation correction before summing gate leakages (estimate real gate output voltages and downstream input loading, or apply a first-order per-gate effective-load calibration).
+\item \textbf{Hierarchical composition / loading (main circuit shortfall).} Circuit prediction sums isolated-gate leakages with ideal 0/VDD inputs and no inter-gate loading (as prescribed). Composition floor is 1.37\% median / 5.25\% 95th / 1.85\% mean overall and worsens at hot corners (systematic underestimate), so 99\% circuit mean accuracy is not reachable in our setup with this composition even with perfect gate models. \textbf{Simple improvement:} add a loading/voltage-propagation correction before summing gate leakages (estimate real gate output voltages and downstream input loading, or apply a first-order per-gate effective-load calibration).
 \item \textbf{Non-rail gate inputs.} Internal inverter inputs in AND2/OR2 can be mV away from rails while models are trained/called at exact rails; OFF leakage is exponential in this deviation. Training with a small gate-voltage margin near rails would help.
 \item \textbf{Training distribution vs operating region.} Gate operating points lie near $(V_d,V_s)$ corners at fixed $V_g,V_b$; uniform datasets are sparse there. Rail-sample refinement improved gate median/p95 substantially (1.49/7.36 $\to$ 0.58/2.37\%) with slight uniform-test tradeoff. Operating-region-aware sampling or active learning on gate-level error could improve further.
 \item \textbf{Transistor accuracy.} PMOS OFF remains hardest (test median 1.28\%, p95 11.68\%), especially small/sign-sensitive currents and near data-resolution floor (4.4e-16 A). Large relative errors at very small $|V_{ds}|$ have limited gate impact.
 \item \textbf{Leakage definition.} Project does not define gate leakage uniquely; supply-plus-input-power definition used (consistent with composition/KCL); supply-current-only differs materially only in specific cases (e.g. NOR2 11).
-\item \textbf{Statistics/open points.} One split, one seed per model, 200 corners (no confidence intervals). Open: CLA includes Cin (7 inputs, 128 vectors used), acceptance of notebooks/scripts as code deliverable, and exact definition of ``mean accuracy'' (median/95th/mean relative errors all reported).
+\item \textbf{Statistics and reporting.} One split, one seed per model, 200 corners (no confidence intervals). The 3-bit CLA includes carry-in $c_0$ (7 inputs, all 128 vectors evaluated). The numbered regeneration scripts \texttt{scripts/01\_gen\_data.py}--\texttt{scripts/07\_error\_analysis.py} and \texttt{scripts/run\_all.py} are provided, with executed notebooks \texttt{notebooks/01\_gen\_data.ipynb}--\texttt{07\_error\_analysis.ipynb} included for inspection. ``Mean accuracy'' is reported as $100\%-\text{mean error}$; median, 95th-percentile, and mean relative errors are reported throughout.
 \end{itemize}
 
 \section*{Contributions}
 Work was divided across the team, with a slightly larger share to Lakshya Jindal and Sai Ritvik Uppuganti.
 \begin{itemize}[leftmargin=*]
-\item \textbf{Lakshya Jindal:} Led dataset generation and data-quality checks for the four transistor cases (sampling, SPICE runs, Kirchhoff/trend verification), and led transistor model development including preprocessing, training/comparison of model families, model selection, OFF-model refinement, and final model evaluation.
-\item \textbf{Sai Ritvik Uppuganti:} Led development of the regeneration/testing workflow and self-contained scripts, gate-level and circuit-level validation runs, integration/debugging of the end-to-end pipeline, results verification, and report/LaTeX preparation and build support.
+\item \textbf{Lakshya Jindal:} Contributed to dataset generation and data-quality checks for the four transistor cases (sampling, SPICE runs, Kirchhoff/trend verification), and contributed to transistor model development including preprocessing, training/comparison of model families, model selection, OFF-model refinement, and final model evaluation.
+\item \textbf{Sai Ritvik Uppuganti:} Contributed to development of the regeneration/testing workflow and self-contained scripts, gate-level and circuit-level validation runs, integration/debugging of the end-to-end pipeline, results verification, and report/LaTeX preparation and build support.
 \item \textbf{Swarnava Pal:} Contributed to gate/corner setup and SPICE evaluation support, gate- and circuit-level analysis, plotting/result tabulation, documentation, and cross-checking of deliverables.
 \item \textbf{Divesh Kumar:} Contributed to circuit-level validation and error analysis within the submitted project (SPICE/ML result comparisons, per-vector/corner checks, and supporting experiment runs), along with result cross-checking, debugging assistance, and documentation support.
 \end{itemize}

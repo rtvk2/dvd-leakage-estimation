@@ -32,7 +32,7 @@ The two OFF models were refined with 6,000 extra samples each near the supply ra
 
 | # | Deliverable | Where |
 |---|---|---|
-| 1 | Four datasets (10,000 samples each) | `data/nmos_on.csv`, `nmos_off.csv`, `pmos_on.csv`, `pmos_off.csv` (the extra rail samples used only for training the OFF refinement: `data/extra_nmos_off.csv`, `extra_pmos_off.csv`) |
+| 1 | Four datasets (10,000 samples each) | `data/nmos_on.csv`, `nmos_off.csv`, `pmos_on.csv`, `pmos_off.csv` (extra OFF rail samples for refinement: `data/extra_nmos_off.csv`, `extra_pmos_off.csv`; 5,000 added to training and 1,000 used as a separate rail-validation set per OFF case) |
 | 2 | Example netlists | `netlists/` (four single transistors, five gates, `test_circuit_cla3.cir`) |
 | 3 | Data check: Kirchhoff and three trend plots | `results/kirchhoff_check.*`, `results/trend_*.png`, `results/trend_check.csv` |
 | 4 | Model comparison (4 model types x 4 cases) | `results/model_comparison_table.csv`, `model_comparison.png`, `baselines_validation.csv`, `model_comparison_all_runs.csv` |
@@ -59,7 +59,7 @@ python scripts/03_train.py             # run a single step directly
 
 | Script / Notebook step | Content | Time on the machine used |
 |---|---|---|
-| `01_gen_data` | four single-transistor datasets, example netlists, extra rail samples for the OFF cases | 3 min |
+| `01_gen_data` | four single-transistor datasets, example netlists, extra rail samples for the OFF cases (5k train / 1k rail-validation split used in refinement) | 3 min |
 | `02_check_data` | Kirchhoff check, three trend plots | 1 min |
 | `03_train` | split, four model types, comparison, test set, refinement of the OFF models, saved models | 1.5 to 2 h |
 | `04_gate_spice` | five gate netlists, 200 corners, 3,600 gate-level SPICE points | 1 min |
